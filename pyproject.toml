@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "secuserve-liveness-module"
+version = "0.1.0"
+description = "A module for secuserve to reconize the liveness of faces"
+authors = ["NicholasBlackburn1 <nickblackburn02@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+tensorflow = "^2.6.1"
+zmq = "^0.0.0"
+pytest = "^6.2.5"
+colorama = "^0.4.4"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
