@@ -1,15 +1,11 @@
 """
 this is the main class for the liveeness dector 
+TODO: need to actually get the liveness dector working 
 """
 
 from utils import consoleLog
 import zmq
 from datetime import datetime
-from utility.video_utils import VideoUtils
-from face_det.TDDFA import TDDFA
-from face_det.FaceBoxes import FaceBoxes
-from face_detector import FaceDetector
-from utility import main as mn
 import cv2
 import yaml
 import numpy as np

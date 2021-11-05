@@ -208,6 +208,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "keras"
+version = "2.7.0"
+description = "Deep learning for humans."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "keras-preprocessing"
 version = "1.1.2"
 description = "Easy data preprocessing and data augmentation for deep learning models"
@@ -696,7 +704,7 @@ pyzmq = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8"
-content-hash = "9499414829b52f19c5cdea8e78a8c9529137c8da7158f4b747788ee0710e420b"
+content-hash = "6d5d1056617c58ed3337efcab1aa03d09a2146a9e4556b6b1b1ff5c14db29c46"
 
 [metadata.files]
 absl-py = [
@@ -933,6 +941,9 @@ idna = [
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
+]
+keras = [
+    {file = "keras-2.7.0-py2.py3-none-any.whl", hash = "sha256:0c33ae1f728064ca0d35dfba999e9c316f03623bf5688c82fb83cc74a80ea248"},
 ]
 keras-preprocessing = [
     {file = "Keras_Preprocessing-1.1.2-py2.py3-none-any.whl", hash = "sha256:7b82029b130ff61cc99b55f3bd27427df4838576838c5b2f65940e4fcec99a7b"},
