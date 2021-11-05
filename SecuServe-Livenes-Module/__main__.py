@@ -27,7 +27,7 @@ def main():
     sender.send_json({'status':"Starting",'alive':False,'time':str(datetime.now)})
     
     consoleLog.PipeLine_Ok("Started Zmq...")
-    mn()
+
 
     
 
