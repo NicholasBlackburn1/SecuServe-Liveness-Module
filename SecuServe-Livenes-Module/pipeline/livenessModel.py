@@ -1,5 +1,6 @@
 """
 this is where the liveness model is for training and handling the creation of the liveness detection
+TODO: get live model to reconize and output stuff to the zmq
 """
 
 from keras.models import Sequential
@@ -50,4 +51,16 @@ class LivenessModel(object):
                             epochs=20
         )
         consoleLog.PipeLine_Ok("Finished Training Model Successfull....")
-        return model
+        return 
+        
+
+    #* checks for blinking 
+    def isBlinking(self,history, maxFrames):
+        """ @history: A string containing the history of eyes status 
+            where a '1' means that the eyes were closed and '0' open.
+            @maxFrames: The maximal number of successive frames where an eye is closed """
+        for i in range(maxFrames):
+            pattern = '1' + '0'*(i+1) + '1'
+            if pattern in history:
+                return True
+        return False

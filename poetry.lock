@@ -200,6 +200,18 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "imagezmq"
+version = "1.1.1"
+description = "Transporting OpenCV images via ZMQ"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+numpy = ">=1.13"
+pyzmq = ">=16.0"
+
+[[package]]
 name = "iniconfig"
 version = "1.1.1"
 description = "iniconfig: brain-dead simple config-ini parsing"
@@ -704,7 +716,7 @@ pyzmq = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.8"
-content-hash = "6d5d1056617c58ed3337efcab1aa03d09a2146a9e4556b6b1b1ff5c14db29c46"
+content-hash = "36fa8258893330a88ebded84824032335f441c61e8527236c2a40a61540aab48"
 
 [metadata.files]
 absl-py = [
@@ -937,6 +949,10 @@ h5py = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+imagezmq = [
+    {file = "imagezmq-1.1.1-py3-none-any.whl", hash = "sha256:3cb44dd766bbdac1d65d2a93dc703fcc63a73cba69fe24bb530ab6e221634c45"},
+    {file = "imagezmq-1.1.1.tar.gz", hash = "sha256:9518976933ede8243c0f15f65bbe30c0a6887937f4e818eadbdd7662d27ba399"},
 ]
 iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
