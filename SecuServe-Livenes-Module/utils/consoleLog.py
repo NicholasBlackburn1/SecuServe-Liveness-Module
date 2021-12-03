@@ -5,6 +5,7 @@ Simple Debuging Colorizer for the console uwu
 import colorama
 from datetime import datetime
 
+
 def info(text):
     dmsgLayout("INFO", colorama.Fore.WHITE, text)
     return
@@ -41,8 +42,8 @@ def PipeLine_Data(text):
     return
 
 
-def dmsgLayout(type, color, message):
-    print(
+def dmsgLayout(type, color, message) -> str:
+    return (
         colorama.Fore.GREEN
         + "["
         + str(datetime.now())
