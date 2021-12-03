@@ -33,7 +33,7 @@ def main():
     port = 5555
     receiver = VideoStreamSubscriber(hostname, port)
 
-    print(consoleLog.Warning("Connecting to Imgzmq port for frames..."))
+    tf.print(consoleLog.Warning("Connecting to Imgzmq port for frames..."),output_stream=sys.stdout)
     
     LiveDetection.runPipeline(LiveDetection,receiver)
     
