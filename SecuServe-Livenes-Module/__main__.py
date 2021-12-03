@@ -13,6 +13,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 from pipeline.videoStreamSubscriber import VideoStreamSubscriber
+from pipeline.LiveDetection import LiveDetection
 import traceback
 
 def main():
@@ -33,7 +34,9 @@ def main():
     receiver = VideoStreamSubscriber(hostname, port)
 
     print(consoleLog.Warning("Connecting to Imgzmq port for frames..."))
-  
+    
+    LiveDetection.runPipeline(LiveDetection,receiver)
+    
 
 
 if __name__ == "__main__":

@@ -4,6 +4,9 @@ this class is for detecting and findign and handling computer vision /tensorflow
 
 
 import cv2
+import numpy as np
+import sys 
+import traceback
 
 class LiveDetection(object):
 
@@ -16,7 +19,7 @@ class LiveDetection(object):
         pass
 
 
-    def runPipeline(self):
+    def runPipeline(self,receiver):
 
 
         try:
