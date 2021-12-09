@@ -14,6 +14,7 @@ import tensorflow as tf
 import sys
 from pipeline.videoStreamSubscriber import VideoStreamSubscriber
 from pipeline.LiveDetection import LiveDetection
+from pipeline import pipelineStates
 from utils import const
 import traceback
 
@@ -24,9 +25,11 @@ def main():
 
     #* recv socket for commands
     recv = context.socket(zmq.SUB)
+
+    recv.setsockopt(zmq.SUBSCRIBE, b"")
     recv.connect(const.zmq_recv)
 
-    #* sender for Socket info
+    #* sender for Socket 
     sender = context.socket(zmq.PUB)
     sender.bind(const.zmq_sender)
 
@@ -44,8 +47,13 @@ def main():
 
     tf.print(consoleLog.Warning("Connecting to Imgzmq port for frames..."),output_stream=sys.stdout)
     
-    LiveDetection.runPipeline(LiveDetection,receiver)
-    
+       # sets pipeline starting state so Fsm has all needed to run
+    pipe = pipelineStates.PipeLine()
+    pipe.on_event(pipelineStates.States.SETUP_PIPELINE, sender,receiver,poller)
+    pipe.on_event(pipelineStates.States.TRAIN_MODEL, sender,receiver,poller)
+    pipe.on_event(pipelineStates.States.RUN_RECONITION, sender,receiver,poller)
+
+
 
 
 if __name__ == "__main__":
