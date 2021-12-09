@@ -6,7 +6,7 @@ from enum import Enum
 
 
 from zmq.sugar.frame import Message
-from pipeline import videoRequired
+from pipeline import LiveDetection
 from utils import consoleLog
 from pipeline import state
 
@@ -27,11 +27,11 @@ class SetupPipeLine(state.State):
     The state.State which Sets Up Whole opencv pipeline
     """
 
-    def on_event(self, event, sender,receiver,poller):
+    def on_event(self, event, sender,receiver,poller,tf):
         if event == States.SETUP_PIPELINE:
           
             #TODO: GET FACE LIVE PIPELINE SETUP
-
+            LiveDetection.LiveDetection.pipelineSetUp(LiveDetection,sender=sender,recv=receiver,poller=poller,tf=tf)
             # consoleLog.PipeLine_Data("Model last trained"+" "+ str(moddate['%H']))
             self.next_state(States.TRAIN_MODEL)
 
@@ -62,8 +62,8 @@ class RunReconitionPipeLine(state.State):
 
     def on_event(self, event, sender,recv,poller):
         if event == States.RUN_RECONITION:
-            #TODO:  Run the liveness pipeline
-            pass
+            LiveDetection.LiveDetection.runPipeline(LiveDetection,sender=sender,receiver=recv,poller = poller)
+            
          
 
         return self
@@ -76,8 +76,8 @@ class Idle(state.State):
 
     def on_event(self, event, sender,receiver,poller):
         if event == States.IDLE:
-            videoRequired.consoleLog.Warning("Idleing....")
-            videoRequired.time.sleep(0.5)
+            consoleLog.Warning("Idleing....")
+            time.sleep(0.5)
 
         return self
 
@@ -114,7 +114,7 @@ class PipeLine(object):
         # Start with a default state.State.
         self.State = SetupPipeLine()
 
-    def on_event(self, event, sender,receiver,poller):
+    def on_event(self, event, sender,receiver,poller,tf,img_receiver):
         """
         This is the bread and butter of the state.State machine. Incoming events are
         delegated to the given state.States which then handle the event. The result is
@@ -122,7 +122,7 @@ class PipeLine(object):
         """
 
         # The next state.State will be the result of the on_event function.
-        self.State = self.State.on_event(event, sender,receiver,poller)
+        self.State = self.State.on_event(event, sender,receiver,poller,tf,img_receiver)
 
     def getCurrentStat(self):
         return self.State

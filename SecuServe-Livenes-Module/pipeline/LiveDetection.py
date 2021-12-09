@@ -19,8 +19,8 @@ class LiveDetection(object):
 
 
     #* sets up pipeline 
-    def pipelineSetUp(self,tf):
-
+    def pipelineSetUp(self,tf,sender):
+        
         consoleLog.Warning("Staring to set up gpu in tensorflow")
 
         # Allow GPU memory growth
@@ -42,14 +42,14 @@ class LiveDetection(object):
 
     
     #* this is where the tensorflow will run our liveness detection 
-    def runPipeline(self,receiver):
+    def runPipeline(self,img_receiver,sender,recv,poller):
 
 
         try:
             #* this llows me to recive frames from my camera over the network
             while True:
                 
-                msg, frame = receiver.receive()
+                msg, frame = img_receiver.receive()
                 image = cv2.imdecode(np.frombuffer(frame, dtype='uint8'), -1)
 
                 cv2.imshow("wo",image)
@@ -75,3 +75,6 @@ class LiveDetection(object):
     def sendLifeStatus(self,sender):
         pass
         
+
+
+    def sendProgramStatus(self, sender):

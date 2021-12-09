@@ -43,15 +43,15 @@ def main():
     print(consoleLog.PipeLine_Ok("Started Zmq..."))
 
 
-    receiver = VideoStreamSubscriber(const.hostname, const.port)
+    img_receiver = VideoStreamSubscriber(const.hostname, const.port)
 
     tf.print(consoleLog.Warning("Connecting to Imgzmq port for frames..."),output_stream=sys.stdout)
     
        # sets pipeline starting state so Fsm has all needed to run
     pipe = pipelineStates.PipeLine()
-    pipe.on_event(pipelineStates.States.SETUP_PIPELINE, sender,receiver,poller)
-    pipe.on_event(pipelineStates.States.TRAIN_MODEL, sender,receiver,poller)
-    pipe.on_event(pipelineStates.States.RUN_RECONITION, sender,receiver,poller)
+    pipe.on_event(pipelineStates.States.SETUP_PIPELINE, sender,recv,poller,tf)
+    pipe.on_event(pipelineStates.States.TRAIN_MODEL, sender,recv,poller,tf)
+    pipe.on_event(pipelineStates.States.RUN_RECONITION, sender,recv,poller,tf)
 
 
 
