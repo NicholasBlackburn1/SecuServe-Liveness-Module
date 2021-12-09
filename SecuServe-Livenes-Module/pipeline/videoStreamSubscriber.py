@@ -17,12 +17,10 @@ class VideoStreamSubscriber:
         self._thread.daemon = True
         self._thread.start()
 
-    def receive(self, timeout=10.0):
+    def receive(self, timeout=5.0):
         flag = self._data_ready.wait(timeout=timeout)
         if not flag:
-            raise TimeoutError(
-                "Timeout while reading from subscriber tcp://{}:{}".format(self.hostname, self.port))
-        self._data_ready.clear()
+            self._data_ready.clear()
         return self._data
 
     def _run(self):

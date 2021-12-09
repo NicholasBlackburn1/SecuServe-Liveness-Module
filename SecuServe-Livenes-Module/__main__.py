@@ -23,7 +23,7 @@ def main():
 
     consoleLog.Warning("Startig Zmq....")
 
-    context = zmq.Context(io_threads=2)
+    context = zmq.Context(io_threads=4)
 
     #* sender for Socket 
     sender = context.socket(zmq.PUB)
