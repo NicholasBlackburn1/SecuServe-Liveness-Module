@@ -14,6 +14,7 @@ import tensorflow as tf
 import sys
 from pipeline.videoStreamSubscriber import VideoStreamSubscriber
 from pipeline.LiveDetection import LiveDetection
+from utils import const
 import traceback
 
 def main():
@@ -21,22 +22,25 @@ def main():
 
     context = zmq.Context(io_threads=2)
 
+    #* recv socket for commands
     recv = context.socket(zmq.SUB)
-    recv.connect("tcp://" + "127.0.0.1:5002")
-    
+    recv.connect(const.zmq_recv)
+
     #* sender for Socket info
     sender = context.socket(zmq.PUB)
-    sender.bind("tcp://" + "127.0.0.1:5002")
+    sender.bind(const.zmq_sender)
 
     sender.send_string("LIVENESS")
     sender.send_json({'status':"Starting",'alive':False,'time':str(datetime.now)})
     
+    #* allows to check the output about 20 times a ms
+    poller = zmq.Poller()
+    poller.register(recv, zmq.POLLIN)
+
     print(consoleLog.PipeLine_Ok("Started Zmq..."))
 
 
-    hostname = "127.0.0.1"  # Use to receive from localhost
-    port = 5555
-    receiver = VideoStreamSubscriber(hostname, port)
+    receiver = VideoStreamSubscriber(const.hostname, const.port)
 
     tf.print(consoleLog.Warning("Connecting to Imgzmq port for frames..."),output_stream=sys.stdout)
     
