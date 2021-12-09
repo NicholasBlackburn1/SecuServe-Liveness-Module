@@ -6,9 +6,10 @@ from enum import Enum
 
 
 from zmq.sugar.frame import Message
-from pipeline import LiveDetection
+from pipeline.LiveDetection import LiveDetection
 from utils import consoleLog
 from pipeline import state
+
 
 from datetime import datetime, time
 
@@ -27,11 +28,11 @@ class SetupPipeLine(state.State):
     The state.State which Sets Up Whole opencv pipeline
     """
 
-    def on_event(self, event, sender,tf):
+    def on_event(self, event, sender,tf,img_receiver):
         if event == States.SETUP_PIPELINE:
           
             #TODO: GET FACE LIVE PIPELINE SETUP
-            LiveDetection.LiveDetection.pipelineSetUp(LiveDetection,sender=sender,tf=tf)
+            LiveDetection.pipelineSetUp(LiveDetection(),sender=sender,tf=tf)
             # consoleLog.PipeLine_Data("Model last trained"+" "+ str(moddate['%H']))
             self.next_state(States.TRAIN_MODEL)
 
@@ -60,9 +61,9 @@ class RunReconitionPipeLine(state.State):
     The state.State which Reconizes Faces
     """
 
-    def on_event(self, event, sender):
+    def on_event(self, event, sender,tf,img_receiver):
         if event == States.RUN_RECONITION:
-            LiveDetection.LiveDetection.runPipeline(LiveDetection,sender=sender)
+            LiveDetection.runPipeline(LiveDetection,sender=sender)
             
          
 
@@ -94,7 +95,7 @@ class Error(state.State):
 
     def on_event(self, event, sender):
         if event == States.ERROR:
-            videoRequired.consoleLog.Error("ERROR....")
+            consoleLog.Error("ERROR....")
             sender.send_string("ERROR")
             sender.send_json({"error": str(self.msg), "time": str(datetime.now())})
             return
