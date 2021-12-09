@@ -46,7 +46,7 @@ class TrainPipeline(state.State):
     The state.State which Trains the Reconized face Models
     """
 
-    def on_event(self, event, sender):
+    def on_event(self, event, sender,tf,img_receiver):
         if event == States.TRAIN_MODEL:
 
             #TODO: Set up training UwU
@@ -63,7 +63,7 @@ class RunReconitionPipeLine(state.State):
 
     def on_event(self, event, sender,tf,img_receiver):
         if event == States.RUN_RECONITION:
-            LiveDetection.runPipeline(LiveDetection,sender=sender)
+            LiveDetection.runPipeline(LiveDetection(),sender=sender,img_receiver=img_receiver)
             
          
 

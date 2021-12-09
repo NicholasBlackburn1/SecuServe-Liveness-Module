@@ -14,13 +14,15 @@ import dlib
 from utils import const
 from scipy.spatial import distance as dist
 from imutils import face_utils
+from datetime import datetime
 
 class LiveDetection(object):
 
 
     COUNTER = 0
     EYE_AR_THRESH = 0.23 
-
+    EYE_AR_CONSEC_FRAMES = 2
+    TOTAL = 0
 
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
@@ -82,16 +84,16 @@ class LiveDetection(object):
     #* this is where the tensorflow will run our liveness detection 
     def runPipeline(self,img_receiver,sender):
 
-        self.sendProgramStatus(sender=sender, status="Starting LifeNess detection")
+        self.sendProgramStatus(sender,"Starting LifeNess detection")
         consoleLog.info("Starting To run the Liveness pipeline")
 
         #* this is for decting and seeing that there is a face
         detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor(const)
+        predictor = dlib.shape_predictor(const.landmarks)
 
         try:
             consoleLog.Warning("Running Livenesss pipeline")
-            self.sendProgramStatus(sender=sender, status="Liveness detection is Running")
+            self.sendProgramStatus(sender, "Liveness detection is Running")
 
             #* this llows me to recive frames from my camera over the network
             while True:
@@ -109,11 +111,11 @@ class LiveDetection(object):
         
         except Exception as ex:
             consoleLog.Error('Python error with no Exception handler:')
-            consoleLog.Error('Traceback error:', ex)
+            consoleLog.Error('Traceback error:'+str(ex))
             consoleLog.Error(traceback.print_exc())
 
     # gets the aspect of eyes
-    def eye_aspect_ratio(eye):
+    def eye_aspect_ratio(self,eye):
         # compute the euclidean distances between the two sets of
 	    # vertical eye landmarks (x, y)-coordinates and the horizontal
         A = dist.euclidean(eye[1], eye[5])
@@ -147,6 +149,8 @@ class LiveDetection(object):
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
+            cv2.imshow("Output",image)
+            cv2.waitKey(1)
             self.detectBlinking(ear,sender=sender)
 
 
