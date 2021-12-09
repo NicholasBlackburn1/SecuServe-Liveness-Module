@@ -21,7 +21,7 @@ class LiveDetection(object):
 
     COUNTER = 0
     EYE_AR_THRESH = 0.23 
-    EYE_AR_CONSEC_FRAMES = 2
+    EYE_AR_CONSEC_FRAMES = 3.0
     TOTAL = 0
 
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
@@ -29,21 +29,6 @@ class LiveDetection(object):
 
 
 
-
-    #* does a blink calculation on my frames
-    def detectBlinking(self, ear, sender):
-        # this checks to see if the eyes for seen blinking or a sig nifigant number
-        if ear < self.EYE_AR_THRESH:
-            self.COUNTER += 1
-        else:
-            if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
-                self.TOTAL += 1
-                self.sendLifeStatus(sender=sender, Alive=True)
-            else:
-                self.sendLifeStatus(sender=sender, Alive=False)
-
-                # reset the eye frame counter
-                self.COUNTER = 0
 
     #* sends status updates from liveness detection
     def sendLifeStatus(self,sender,Alive:bool):
@@ -149,9 +134,20 @@ class LiveDetection(object):
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            cv2.imshow("Output",image)
-            cv2.waitKey(1)
-            self.detectBlinking(ear,sender=sender)
+            
+            if ear < self.EYE_AR_THRESH:
+                self.COUNTER += 1
+            else:
+                if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
+                    self.TOTAL += 1
+                    consoleLog.Debug("sending message to opencv")
+                    self.sendLifeStatus(sender=sender, Alive=False)
+                    consoleLog.PipeLine_Ok("Set data to opencv")
+                else:
+                    
+                        self.sendLifeStatus(sender=sender, Alive=True)
+                    # reset the eye frame counter
+                self.COUNTER = 0
 
 
     
