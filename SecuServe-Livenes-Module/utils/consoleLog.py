@@ -4,40 +4,40 @@ Simple Debuging Colorizer for the console uwu
 
 import colorama
 from datetime import datetime
-
+import tensorflow as tf
 
 def info(text):
-    dmsgLayout("INFO", colorama.Fore.WHITE, text)
+    tf.get_logger().info(dmsgLayout("INFO", colorama.Fore.WHITE, text))
     return
 
 
-def Debug(text):
-    dmsgLayout("DEBUG", colorama.Fore.LIGHTBLUE_EX, text)
+def Debug(text): 
+    tf.get_logger().debug(dmsgLayout("DEBUG", colorama.Fore.LIGHTBLUE_EX, text))
     return
 
 
 def Warning(text):
-    dmsgLayout("WARNING", colorama.Fore.YELLOW, text)
+    tf.get_logger().warning(dmsgLayout("WARNING", colorama.Fore.YELLOW, text))
     return
 
 
 def Error(text):
-    dmsgLayout("ERROR", colorama.Fore.RED, text)
+    tf.get_logger().error(dmsgLayout("ERROR", colorama.Fore.RED, text))
     return
 
 
 def PipeLine_Ok(text):
-    dmsgLayout("OK", colorama.Fore.LIGHTGREEN_EX, text)
+    tf.get_logger().info(dmsgLayout("OK", colorama.Fore.LIGHTGREEN_EX, text))
     return
 
 
 def PipeLine_init(text):
-    dmsgLayout("INIT", colorama.Fore.LIGHTMAGENTA_EX, text)
+    tf.get_logger().info(dmsgLayout("INIT", colorama.Fore.LIGHTMAGENTA_EX, text))
     return
 
 
 def PipeLine_Data(text):
-    dmsgLayout("DATA", colorama.Fore.LIGHTCYAN_EX, text)
+    tf.get_logger().info(dmsgLayout("DATA", colorama.Fore.LIGHTCYAN_EX, text))
 
     return
 

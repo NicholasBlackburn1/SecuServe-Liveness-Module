@@ -27,11 +27,11 @@ class SetupPipeLine(state.State):
     The state.State which Sets Up Whole opencv pipeline
     """
 
-    def on_event(self, event, sender,receiver,poller,tf):
+    def on_event(self, event, sender,tf):
         if event == States.SETUP_PIPELINE:
           
             #TODO: GET FACE LIVE PIPELINE SETUP
-            LiveDetection.LiveDetection.pipelineSetUp(LiveDetection,sender=sender,recv=receiver,poller=poller,tf=tf)
+            LiveDetection.LiveDetection.pipelineSetUp(LiveDetection,sender=sender,tf=tf)
             # consoleLog.PipeLine_Data("Model last trained"+" "+ str(moddate['%H']))
             self.next_state(States.TRAIN_MODEL)
 
@@ -45,7 +45,7 @@ class TrainPipeline(state.State):
     The state.State which Trains the Reconized face Models
     """
 
-    def on_event(self, event, sender,receiver,poller):
+    def on_event(self, event, sender):
         if event == States.TRAIN_MODEL:
 
             #TODO: Set up training UwU
@@ -60,9 +60,9 @@ class RunReconitionPipeLine(state.State):
     The state.State which Reconizes Faces
     """
 
-    def on_event(self, event, sender,recv,poller):
+    def on_event(self, event, sender):
         if event == States.RUN_RECONITION:
-            LiveDetection.LiveDetection.runPipeline(LiveDetection,sender=sender,receiver=recv,poller = poller)
+            LiveDetection.LiveDetection.runPipeline(LiveDetection,sender=sender)
             
          
 
@@ -114,7 +114,7 @@ class PipeLine(object):
         # Start with a default state.State.
         self.State = SetupPipeLine()
 
-    def on_event(self, event, sender,receiver,poller,tf,img_receiver):
+    def on_event(self, event, sender,tf,img_receiver):
         """
         This is the bread and butter of the state.State machine. Incoming events are
         delegated to the given state.States which then handle the event. The result is
@@ -122,7 +122,7 @@ class PipeLine(object):
         """
 
         # The next state.State will be the result of the on_event function.
-        self.State = self.State.on_event(event, sender,receiver,poller,tf,img_receiver)
+        self.State = self.State.on_event(event, sender,tf,img_receiver)
 
     def getCurrentStat(self):
         return self.State

@@ -3,6 +3,7 @@ this class is for detecting and findign and handling computer vision /tensorflow
 """
 
 
+import datetime
 import cv2
 import numpy as np
 import sys 
@@ -42,7 +43,7 @@ class LiveDetection(object):
 
     
     #* this is where the tensorflow will run our liveness detection 
-    def runPipeline(self,img_receiver,sender,recv,poller):
+    def runPipeline(self,img_receiver,sender,poller):
 
 
         try:
@@ -52,6 +53,7 @@ class LiveDetection(object):
                 msg, frame = img_receiver.receive()
                 image = cv2.imdecode(np.frombuffer(frame, dtype='uint8'), -1)
 
+                
                 cv2.imshow("wo",image)
                 cv2.waitKey(1)
 
@@ -63,9 +65,7 @@ class LiveDetection(object):
             print('Traceback error:', ex)
             traceback.print_exc()
             
-        finally:
-            receiver.close()
-            sys.exit()
+
 
     #* does a blink calculation on my frames
     def detectBlinking(self):
@@ -77,4 +77,11 @@ class LiveDetection(object):
         
 
 
-    def sendProgramStatus(self, sender):
+    # this will send status messages accross the pipeline
+    def sendProgramStatus(self, sender,status):
+        
+        sender.send_string("LIVENESS_STATS")
+        sender.send_json({'status':'"'+status+'"','alive':False,'time':str(datetime.now)})
+
+
+    
