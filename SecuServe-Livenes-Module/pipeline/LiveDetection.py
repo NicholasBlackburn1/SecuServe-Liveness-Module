@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 import sys 
 import traceback
-from realtime.utility.video_utils import VideoUtils
+from utils import consoleLog
 
 class LiveDetection(object):
 
@@ -20,15 +20,25 @@ class LiveDetection(object):
 
     #* sets up pipeline 
     def pipelineSetUp(self,tf):
-                
+
+        consoleLog.Warning("Staring to set up gpu in tensorflow")
+
         # Allow GPU memory growth
         gpus = tf.config.experimental.list_physical_devices('GPU')
         if gpus:
             try:
                 for gpu in gpus:
+
                     tf.config.experimental.set_memory_growth(gpu, True)
+                    consoleLog.PipeLine_Ok("set Tensorflow to use all mem gpu")
+
             except RuntimeError as e:
-                print(e)
+
+                consoleLog.Error(e)
+
+       
+
+        
 
     
     #* this is where the tensorflow will run our liveness detection 
@@ -41,6 +51,9 @@ class LiveDetection(object):
                 
                 msg, frame = receiver.receive()
                 image = cv2.imdecode(np.frombuffer(frame, dtype='uint8'), -1)
+
+                cv2.imshow("wo",image)
+                cv2.waitKey(1)
 
         except (KeyboardInterrupt, SystemExit):
             print('Exit due to keyboard interrupt')

@@ -17,7 +17,7 @@ class VideoStreamSubscriber:
         self._thread.daemon = True
         self._thread.start()
 
-    def receive(self, timeout=15.0):
+    def receive(self, timeout=10.0):
         flag = self._data_ready.wait(timeout=timeout)
         if not flag:
             raise TimeoutError(

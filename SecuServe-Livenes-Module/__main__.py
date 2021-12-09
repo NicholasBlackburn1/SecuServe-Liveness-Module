@@ -19,9 +19,14 @@ import traceback
 def main():
     tf.print(consoleLog.Warning("Startig Zmq...."))
 
-    context = zmq.Context()
+    context = zmq.Context(io_threads=2)
+
+    recv = context.socket(zmq.SUB)
+    recv.connect("tcp://" + "127.0.0.1:5002")
+    
+    #* sender for Socket info
     sender = context.socket(zmq.PUB)
-    sender.bind("tcp://" + "127.0.0.1:5000")
+    sender.bind("tcp://" + "127.0.0.1:5002")
 
     sender.send_string("LIVENESS")
     sender.send_json({'status':"Starting",'alive':False,'time':str(datetime.now)})
