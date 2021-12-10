@@ -21,7 +21,7 @@ class LiveDetection(object):
 
     COUNTER = 0
     EYE_AR_THRESH = 0.23 
-    EYE_AR_CONSEC_FRAMES = 3.0
+    EYE_AR_CONSEC_FRAMES = 2.0
     TOTAL = 0
 
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
@@ -134,7 +134,8 @@ class LiveDetection(object):
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            
+            cv2.imshow("eyedect", image)
+            cv2.waitKey(1)
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
             else:
