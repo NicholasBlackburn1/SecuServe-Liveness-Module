@@ -23,6 +23,7 @@ keras = "^2.7.0"
 imagezmq = "^1.1.1"
 dlib = "^19.22.1"
 imutils = "^0.5.4"
+mediapipe = "^0.8.9"
 
 [tool.poetry.dev-dependencies]
 

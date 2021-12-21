@@ -1,5 +1,6 @@
 """
 this class is for detecting and findign and handling computer vision /tensorflow of detecting faces lively 
+#TODO TRY TO GET TENSORFLOW TO RECONIZE BODY POS to see if the user is alive too
 """
 
 
@@ -16,6 +17,8 @@ from scipy.spatial import distance as dist
 from imutils import face_utils
 from datetime import datetime
 from cv2.data import haarcascades
+
+from utils import pose 
 
 class LiveDetection(object):
 
@@ -37,9 +40,9 @@ class LiveDetection(object):
 
 
     #* sends status updates from liveness detection
-    def sendLifeStatus(self,sender,Alive:bool):
+    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool):
         sender.send_string("LIVENESS_STATS")
-        sender.send_json({'alive':Alive,'time':str(datetime.now)})
+        sender.send_json({'alive':Alive,'time':str(datetime.now), 'hasBody':hasbody})
 
 
 
@@ -96,8 +99,10 @@ class LiveDetection(object):
                 # detect faces in the grayscale frame
                 rects = detector(gray, 0)
                 
-                self.eyePosDetection(image,ret=rects)
-                self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender)
+                #self.eyePosDetection(image,ret=rects)
+                pos = pose.PoseDetector( mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.5)
+                
+                self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = pos)
 
 
         
@@ -119,7 +124,7 @@ class LiveDetection(object):
 
     
     # * this allows me to set the face landmarks on the usrs faces
-    def faceLandmarks(self,rects,predictor,face_utils,gray,image, sender):
+    def faceLandmarks(self,rects,predictor,face_utils,gray,image, sender, pos):
         for rect in rects:
             # determine the facial landmarks for the face region, then
             # convert the facial landmark (x, y)-coordinates to a NumPy
@@ -150,12 +155,12 @@ class LiveDetection(object):
                     self.TOTAL += 1
 
                     consoleLog.Debug("sending message to opencv")
-                    self.sendLifeStatus(sender=sender, Alive=False)
+                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=self.detectSkeliton(pos,image))
                     consoleLog.PipeLine_Ok("Set data to opencv")
 
                 else:
-                    
-                        self.sendLifeStatus(sender=sender, Alive=True)
+                        
+                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False)
                     # reset the eye frame counter
                 self.COUNTER = 0
 
@@ -214,6 +219,7 @@ class LiveDetection(object):
 
                 cv2.imshow("cle",clahe)
 
+    #* draws info on opencv frame output 
     def localinfo(self,frame,info):
         cv2.putText(
         frame,
@@ -225,4 +231,11 @@ class LiveDetection(object):
         1,
     )
 
-  
+    #detects a user skeletion 
+    def detectSkeliton(self,pose,frame):
+
+        img, sees = pose.findPose(frame)
+        
+        cv2.imshow("Image", img)
+        return sees
+
