@@ -15,6 +15,7 @@ from utils import const
 from scipy.spatial import distance as dist
 from imutils import face_utils
 from datetime import datetime
+from cv2.data import haarcascades
 
 class LiveDetection(object):
 
@@ -93,6 +94,7 @@ class LiveDetection(object):
                 # detect faces in the grayscale frame
                 rects = detector(gray, 0)
                 
+                self.eyePosDetection(image,ret=rects)
                 self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender)
 
 
@@ -149,7 +151,6 @@ class LiveDetection(object):
                     self.sendLifeStatus(sender=sender, Alive=False)
                     consoleLog.PipeLine_Ok("Set data to opencv")
 
-                    self.eyePosDetection(image,ret=rect)
                 else:
                     
                         self.sendLifeStatus(sender=sender, Alive=True)
@@ -172,30 +173,26 @@ class LiveDetection(object):
     #* eye detection and pos location
     def eyePosDetection(self,frame,ret):
         
-        cv2.line(frame, (320,0), (320,480), (0,200,0), 2)
-        cv2.line(frame, (0,200), (640,200), (0,200,0), 2)
-        
-        if ret==True:
-            col=frame
-            
-            frame = cv2.cvtColor(frame,cv2.COLOR_RGB2GRAY)
-
+    
+        if ret:
+         
+            eyesUwU = frame
             pupilFrame=frame
             clahe=frame
-            blur=frame
-            edges=frame
+            cv2.line(eyesUwU, (320,0), (320,480), (0,200,0), 2)
+            cv2.line(eyesUwU, (0,200), (640,200), (0,200,0), 2)
+        
 
-            eyes = cv2.CascadeClassifier('haarcascade_eye.xml')
-            detected = eyes.detectMultiScale(frame, 1.3, 5)
+            eyes = cv2.CascadeClassifier("../SecuServeFiles/haarcascade_eye.xml")
+            detected = eyes.detectMultiScale(eyesUwU, 1.3, 5)
 
             for (x,y,w,h) in detected: #similar to face detection but for eyes
 
-                cv2.rectangle(frame, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
-                cv2.line(frame, (x,y), ((x+w,y+h)), (0,0,255),1)   #draw cross
-                cv2.line(frame, (x+w,y), ((x,y+h)), (0,0,255),1)
+                cv2.rectangle(eyesUwU, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
+                cv2.line(eyesUwU, (x,y), (x+w,y+h), (0,0,255),1)   #draw cross
+                cv2.line(eyesUwU, (x+w,y), (x,y+h), (0,0,255),1)
 
-                pupilFrame = cv2.equalizeHist(frame[y+(h*.25):(y+h), x:(x+w)]) #using histogram equalization of better image. 
-                
+                pupilFrame =  cv2.cvtColor(eyesUwU,cv2.CV_8UC1)
                 cl1 = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8)) #set grid size
                 clahe = cl1.apply(pupilFrame)  #clahe
                 blur = cv2.medianBlur(clahe, 7)  #median blur
@@ -208,6 +205,7 @@ class LiveDetection(object):
                     for (x,y,r) in circles:
                         cv2.circle(pupilFrame, (x, y), r, (0, 255, 255), 2)
                         cv2.rectangle(pupilFrame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                        cv2.imshow("eye pos", eyesUwU)
                         #set thresholds
                         self.eyeThresholding(x)
                         
