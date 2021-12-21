@@ -144,9 +144,12 @@ class LiveDetection(object):
             else:
                 if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
                     self.TOTAL += 1
+
                     consoleLog.Debug("sending message to opencv")
                     self.sendLifeStatus(sender=sender, Alive=False)
                     consoleLog.PipeLine_Ok("Set data to opencv")
+
+                    self.eyePosDetection(image,ret=rect)
                 else:
                     
                         self.sendLifeStatus(sender=sender, Alive=True)
@@ -206,6 +209,6 @@ class LiveDetection(object):
                         cv2.circle(pupilFrame, (x, y), r, (0, 255, 255), 2)
                         cv2.rectangle(pupilFrame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
                         #set thresholds
-                        thresholding(x)
+                        self.eyeThresholding(x)
                         
         
