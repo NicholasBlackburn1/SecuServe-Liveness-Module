@@ -28,6 +28,8 @@ class LiveDetection(object):
     left_counter = 0 
     right_counter = 0
 
+    blob_detector = None
+
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
@@ -185,7 +187,7 @@ class LiveDetection(object):
            
       
             for (x,y,w,h) in detected: #similar to face detection but for eyes
-                cropped = eyesUwU[200, 300]
+                
 
                 cv2.rectangle(eyesUwU, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
                 cv2.line(eyesUwU, (x,y), (x+w,y+h), (0,0,255),1)   #draw cross
@@ -193,22 +195,24 @@ class LiveDetection(object):
 
                 pupilFrame = cv2.cvtColor(eyesUwU, cv2.COLOR_BGR2GRAY)
 
-                cl1 = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8)) #set grid size
+                cl1 = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8,8)) #set grid size
                 clahe = cl1.apply(pupilFrame)  #clahe
                 blur = cv2.medianBlur(clahe, 7)  #median blur
-                circles = cv2.HoughCircles(blur ,cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=7,maxRadius=21) #houghcircles
 
+                
+                circles = cv2.HoughCircles(blur ,cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=7,maxRadius=21) #houghcircles
+               
                 if circles is not None: #if atleast 1 is detected
                     circles = np.round(circles[0, :]).astype("int") #change float to integer
-                    self.localinfo(frame,circles)
+                   
                  
                     for (x,y,r) in circles:
+                       
                         cv2.circle(frame, (x, y), r, (0, 255, 255), 2)
                         cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                        cv2.imshow("crp",cropped)
                         self.eyeThresholding(x)
 
-
+                cv2.imshow("cle",clahe)
 
     def localinfo(self,frame,info):
         cv2.putText(
@@ -220,5 +224,5 @@ class LiveDetection(object):
         (255, 255, 255),
         1,
     )
-                    
-        
+
+  
