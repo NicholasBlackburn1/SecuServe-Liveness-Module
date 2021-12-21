@@ -179,20 +179,20 @@ class LiveDetection(object):
             eyesUwU = frame
             pupilFrame=frame
             clahe=frame
-            cv2.line(eyesUwU, (320,0), (320,480), (0,200,0), 2)
-            cv2.line(eyesUwU, (0,200), (640,200), (0,200,0), 2)
-        
-
+           
             eyes = cv2.CascadeClassifier("../SecuServeFiles/haarcascade_eye.xml")
-            detected = eyes.detectMultiScale(eyesUwU, 1.3, 5)
-
+            detected = eyes.detectMultiScale(eyesUwU, 1.36, 5)
+           
+      
             for (x,y,w,h) in detected: #similar to face detection but for eyes
+                cropped = eyesUwU[200, 300]
 
                 cv2.rectangle(eyesUwU, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
                 cv2.line(eyesUwU, (x,y), (x+w,y+h), (0,0,255),1)   #draw cross
                 cv2.line(eyesUwU, (x+w,y), (x,y+h), (0,0,255),1)
 
                 pupilFrame = cv2.cvtColor(eyesUwU, cv2.COLOR_BGR2GRAY)
+
                 cl1 = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8)) #set grid size
                 clahe = cl1.apply(pupilFrame)  #clahe
                 blur = cv2.medianBlur(clahe, 7)  #median blur
@@ -200,13 +200,25 @@ class LiveDetection(object):
 
                 if circles is not None: #if atleast 1 is detected
                     circles = np.round(circles[0, :]).astype("int") #change float to integer
-
-                    consoleLog.info( 'integer for eye pos ',circles)
+                    self.localinfo(frame,circles)
+                 
                     for (x,y,r) in circles:
-                        cv2.circle(pupilFrame, (x, y), r, (0, 255, 255), 2)
-                        cv2.rectangle(pupilFrame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                        cv2.imshow("eye pos", pupilFrame)
-                        #set thresholds
+                        cv2.circle(frame, (x, y), r, (0, 255, 255), 2)
+                        cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+                        cv2.imshow("crp",cropped)
                         self.eyeThresholding(x)
-                        
+
+
+
+    def localinfo(self,frame,info):
+        cv2.putText(
+        frame,
+        "Eye Pos"+str(info),
+        (200, 200),
+        cv2.FONT_HERSHEY_DUPLEX,
+        0.5,
+        (255, 255, 255),
+        1,
+    )
+                    
         
