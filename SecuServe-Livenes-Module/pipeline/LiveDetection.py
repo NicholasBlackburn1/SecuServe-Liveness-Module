@@ -150,8 +150,6 @@ class LiveDetection(object):
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
-            cv2.imshow("eyedect", image)
-            cv2.waitKey(1)
 
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
