@@ -10,7 +10,7 @@ import time
 
 class PoseDetector:
 
-    def __init__(self, mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.3):
+    def __init__(self, mode = False, upBody = False, smooth=False, detectionCon = True, trackCon = 0.3):
 
         self.mode = mode
         self.upBody = upBody

@@ -33,6 +33,8 @@ class LiveDetection(object):
 
     blob_detector = None
 
+    EYE_COUNT = 0
+
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
@@ -40,9 +42,9 @@ class LiveDetection(object):
 
 
     #* sends status updates from liveness detection
-    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool):
-        sender.send_string("LIVENESS_STATS")
-        sender.send_json({'alive':Alive,'time':str(datetime.now), 'hasBody':hasbody})
+    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool,eyeamount:int):
+        sender.send_string("LIVENESS")
+        sender.send_json({'alive':Alive,'time':str(datetime.now), 'hasBody':hasbody, 'eyeAmmount':eyeamount})
 
 
 
@@ -99,10 +101,10 @@ class LiveDetection(object):
                 # detect faces in the grayscale frame
                 rects = detector(gray, 0)
                 
-                #self.eyePosDetection(image,ret=rects)
-                pos = pose.PoseDetector( mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.5)
+                self.eyePosDetection(image,ret=rects)
+                #pos = pose.PoseDetector( mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.5)
                 
-                self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = pos)
+                self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = None)
 
 
         
@@ -124,19 +126,21 @@ class LiveDetection(object):
 
     
     # * this allows me to set the face landmarks on the usrs faces
-    def faceLandmarks(self,rects,predictor,face_utils,gray,image, sender, pos):
+    def faceLandmarks(self,rects,predictor,face_utils,gray,image, sender, pose):
         for rect in rects:
             # determine the facial landmarks for the face region, then
             # convert the facial landmark (x, y)-coordinates to a NumPy
             # array
             shape = predictor(gray, rect)
             shape = face_utils.shape_to_np(shape)
+
             # extract the left and right eye coordinates, then use the
             # coordinates to compute the eye aspect ratio for both eyes
             leftEye = shape[self.lStart:self.lEnd]
             rightEye = shape[self.rStart:self.rEnd]
             leftEAR = self.eye_aspect_ratio(leftEye)
             rightEAR = self.eye_aspect_ratio(rightEye)
+
             # average the eye aspect ratio together for both eyes
             ear = (leftEAR + rightEAR) / 2.0
 
@@ -148,6 +152,7 @@ class LiveDetection(object):
 
             cv2.imshow("eyedect", image)
             cv2.waitKey(1)
+
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
             else:
@@ -155,12 +160,12 @@ class LiveDetection(object):
                     self.TOTAL += 1
 
                     consoleLog.Debug("sending message to opencv")
-                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=self.detectSkeliton(pos,image))
+                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=False,eyeamount=self.EYE_COUNT)
                     consoleLog.PipeLine_Ok("Set data to opencv")
 
                 else:
                         
-                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False)
+                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False, eyeamount=0)
                     # reset the eye frame counter
                 self.COUNTER = 0
 
@@ -206,16 +211,19 @@ class LiveDetection(object):
 
                 
                 circles = cv2.HoughCircles(blur ,cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=7,maxRadius=21) #houghcircles
-               
+            
                 if circles is not None: #if atleast 1 is detected
+
+                    circles = self.EYE_COUNT
+
                     circles = np.round(circles[0, :]).astype("int") #change float to integer
-                   
+                    self.localinfo(eyesUwU,self.EYE_COUNT)
                  
                     for (x,y,r) in circles:
                        
                         cv2.circle(frame, (x, y), r, (0, 255, 255), 2)
                         cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                        self.eyeThresholding(x)
+                        #self.eyeThresholding(x)
 
                 cv2.imshow("cle",clahe)
 
@@ -223,7 +231,7 @@ class LiveDetection(object):
     def localinfo(self,frame,info):
         cv2.putText(
         frame,
-        "Eye Pos"+str(info),
+        "Eye count"+str(info),
         (200, 200),
         cv2.FONT_HERSHEY_DUPLEX,
         0.5,
