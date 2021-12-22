@@ -59,20 +59,7 @@ class LiveDetection(object):
     def pipelineSetUp(self,tf,sender):
         
         self.sendProgramStatus(sender, status="Starting to setup Pipeline...")
-        consoleLog.Warning("Staring to set up gpu in tensorflow")
-
-        # Allow GPU memory growth
-        gpus = tf.config.experimental.list_physical_devices('GPU')
-        if gpus:
-            try:
-                for gpu in gpus:
-
-                    tf.config.experimental.set_memory_growth(gpu, True)
-                    consoleLog.PipeLine_Ok("set Tensorflow to use all mem gpu")
-
-            except RuntimeError as e:
-
-                consoleLog.Error(e)
+        
         self.sendProgramStatus(sender, status="Setup Pipeline wass sucessfull!")
         
 

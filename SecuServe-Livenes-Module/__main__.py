@@ -10,7 +10,7 @@ from datetime import datetime
 import cv2
 import yaml
 import numpy as np
-import tensorflow as tf
+
 import sys
 from pipeline.videoStreamSubscriber import VideoStreamSubscriber
 from pipeline.LiveDetection import LiveDetection
@@ -21,7 +21,7 @@ import traceback
 
 def main():
     
-
+    tf = 0
     consoleLog.Warning("Startig Zmq....")
 
     context = zmq.Context(io_threads=4)
@@ -55,8 +55,3 @@ if __name__ == "__main__":
 
 
 
-
-
-
-if __name__ == '__main__':
-    main()
