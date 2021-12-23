@@ -6,6 +6,8 @@ this class is for detecting and findign and handling computer vision /tensorflow
 
 import datetime
 from os import sendfile
+from random import random
+import time
 import cv2
 import numpy as np
 import sys 
@@ -24,7 +26,7 @@ class LiveDetection(object):
 
 
     COUNTER = 0
-    EYE_AR_THRESH = 0.23 
+    EYE_AR_THRESH = 0.10
     EYE_AR_CONSEC_FRAMES = 2.0
     TOTAL = 0
 
@@ -35,6 +37,8 @@ class LiveDetection(object):
 
     EYE_COUNT = 0.0
 
+    blinked = 0
+
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
 
@@ -42,11 +46,10 @@ class LiveDetection(object):
 
 
     #* sends status updates from liveness detection
-    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool):
-       
+    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool, timesblinked: int):
         sender.send_string("LIVENESS")
-        sender.send_json({'alive':Alive,'time':str(datetime.now()), 'hasBody':hasbody})
-   
+        sender.send_json({'alive':Alive,'time':str(datetime.now()), 'hasBody':hasbody, 'times_blinked':timesblinked})
+        time.sleep(.5)
 
 
 
@@ -136,10 +139,10 @@ class LiveDetection(object):
 
             leftEyeHull = cv2.convexHull(leftEye)
             rightEyeHull = cv2.convexHull(rightEye)
-
+            
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
-
+         
             cv2.imshow("face",image)
             cv2.waitKey(1)
 
@@ -148,17 +151,18 @@ class LiveDetection(object):
             else:
                 if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
                     self.TOTAL += 1
+                    self.blinked +=1
                     
                     consoleLog.Debug("sending message to opencv that eyes blinked")
-                   
-                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=False)
+
+                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=False, timesblinked=self.blinked)
                     consoleLog.PipeLine_Ok("Set data to opencv")
 
                 else:
                         
-                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False)
-                    # reset the eye frame counter
-                        self.COUNTER = 0
+                    self.sendLifeStatus(sender=sender, Alive=True, hasbody=False,timesblinked=0)
+                # reset the eye frame counter
+                    self.COUNTER = 0
 
                 self.COUNTER = 0
                 
