@@ -26,7 +26,7 @@ class LiveDetection(object):
 
 
     COUNTER = 0
-    EYE_AR_THRESH = 0.10
+    EYE_AR_THRESH = 0.23
     EYE_AR_CONSEC_FRAMES = 2.0
     TOTAL = 0
 
@@ -142,10 +142,7 @@ class LiveDetection(object):
             
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
-         
-            cv2.imshow("face",image)
-            cv2.waitKey(1)
-
+        
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
             else:
@@ -165,6 +162,8 @@ class LiveDetection(object):
                     self.COUNTER = 0
 
                 self.COUNTER = 0
+
+
                 
 
 
@@ -179,49 +178,6 @@ class LiveDetection(object):
             if(self.right_counter>self.th_value):
                 consoleLog.info('LEFT EYE')
                 self.right_counter=0
-
-    #* eye detection and pos location
-    def eyePosDetection(self,frame,ret):
-        
-    
-        if ret:
-         
-            eyesUwU = frame
-            pupilFrame=frame
-            clahe=frame
-           
-            eyes = cv2.CascadeClassifier("../SecuServeFiles/haarcascade_eye.xml")
-            detected = eyes.detectMultiScale(eyesUwU, 1.36, 5)
-           
-      
-            for (x,y,w,h) in detected: #similar to face detection but for eyes
-               
-
-                cv2.rectangle(eyesUwU, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
-                cv2.line(eyesUwU, (x,y), (x+w,y+h), (0,0,255),1)   #draw cross
-                cv2.line(eyesUwU, (x+w,y), (x,y+h), (0,0,255),1)
-
-                pupilFrame = cv2.cvtColor(eyesUwU, cv2.COLOR_BGR2GRAY)
-
-                cl1 = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8,8)) #set grid size
-                clahe = cl1.apply(pupilFrame)  #clahe
-                blur = cv2.medianBlur(clahe, 7)  #median blur
-
-                circles = cv2.HoughCircles(blur ,cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=7,maxRadius=21) #houghcircles
-            
-                if circles is not None: #if atleast 1 is detected
-
-                    circles = np.round(circles[0, :]).astype("int") #change float to integer
-                    self.EYE_COUNT = circles
-
-                    consoleLog.info("Eye Count "+ " "+ str(self.EYE_COUNT))
-                    self.localinfo(eyesUwU, str(self.EYE_COUNT), "eyePos")
-                 
-                    for (x,y,r) in circles:
-                       
-                        cv2.circle(frame, (x, y), r, (0, 255, 255), 2)
-                        cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                        self.eyeThresholding(x)
 
                       
 
