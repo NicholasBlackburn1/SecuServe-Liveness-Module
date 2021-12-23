@@ -33,7 +33,7 @@ class LiveDetection(object):
 
     blob_detector = None
 
-    EYE_COUNT = 0
+    EYE_COUNT = 0.0
 
     (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
     (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
@@ -42,9 +42,11 @@ class LiveDetection(object):
 
 
     #* sends status updates from liveness detection
-    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool,eyeamount:int):
+    def sendLifeStatus(self,sender,Alive:bool, hasbody:bool):
+       
         sender.send_string("LIVENESS")
-        sender.send_json({'alive':Alive,'time':str(datetime.now), 'hasBody':hasbody, 'eyeAmmount':eyeamount})
+        sender.send_json({'alive':Alive,'time':str(datetime.now()), 'hasBody':hasbody})
+   
 
 
 
@@ -52,7 +54,7 @@ class LiveDetection(object):
     def sendProgramStatus(self, sender,status):
         
         sender.send_string("LIVENESS_STATS")
-        sender.send_json({'status': '"'+str(status)+'"','alive':False,'time':str(datetime.now)})
+        sender.send_json({'status': '"'+str(status)+'"','alive':False,'time': str(datetime.now())})
 
 
     #* sets up pipeline 
@@ -88,7 +90,7 @@ class LiveDetection(object):
                 # detect faces in the grayscale frame
                 rects = detector(gray, 0)
                 
-                self.eyePosDetection(image,ret=rects)
+                
                 #pos = pose.PoseDetector( mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.5)
                 
                 self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = None)
@@ -115,6 +117,7 @@ class LiveDetection(object):
     # * this allows me to set the face landmarks on the usrs faces
     def faceLandmarks(self,rects,predictor,face_utils,gray,image, sender, pose):
         for rect in rects:
+            #self.eyePosDetection(image,ret=rect)
             # determine the facial landmarks for the face region, then
             # convert the facial landmark (x, y)-coordinates to a NumPy
             # array
@@ -137,22 +140,28 @@ class LiveDetection(object):
             cv2.drawContours(image, [leftEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(image, [rightEyeHull], -1, (0, 255, 0), 1)
 
+            cv2.imshow("face",image)
+            cv2.waitKey(1)
 
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
             else:
                 if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
                     self.TOTAL += 1
-
-                    consoleLog.Debug("sending message to opencv")
-                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=False,eyeamount=self.EYE_COUNT)
+                    
+                    consoleLog.Debug("sending message to opencv that eyes blinked")
+                   
+                    self.sendLifeStatus(sender=sender, Alive=False, hasbody=False)
                     consoleLog.PipeLine_Ok("Set data to opencv")
 
                 else:
                         
-                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False, eyeamount=0)
+                        self.sendLifeStatus(sender=sender, Alive=True, hasbody=False)
                     # reset the eye frame counter
+                        self.COUNTER = 0
+
                 self.COUNTER = 0
+                
 
 
     def eyeThresholding(self,value ):  # function to threshold and give either left or right
@@ -182,7 +191,7 @@ class LiveDetection(object):
            
       
             for (x,y,w,h) in detected: #similar to face detection but for eyes
-                
+               
 
                 cv2.rectangle(eyesUwU, (x,y), ((x+w),(y+h)), (0,0,255),1)	 #draw rectangle around eyes
                 cv2.line(eyesUwU, (x,y), (x+w,y+h), (0,0,255),1)   #draw cross
@@ -194,29 +203,29 @@ class LiveDetection(object):
                 clahe = cl1.apply(pupilFrame)  #clahe
                 blur = cv2.medianBlur(clahe, 7)  #median blur
 
-                
                 circles = cv2.HoughCircles(blur ,cv2.HOUGH_GRADIENT,1,20,param1=50,param2=30,minRadius=7,maxRadius=21) #houghcircles
             
                 if circles is not None: #if atleast 1 is detected
 
-                    circles = self.EYE_COUNT
-
                     circles = np.round(circles[0, :]).astype("int") #change float to integer
-                    self.localinfo(eyesUwU,self.EYE_COUNT)
+                    self.EYE_COUNT = circles
+
+                    consoleLog.info("Eye Count "+ " "+ str(self.EYE_COUNT))
+                    self.localinfo(eyesUwU, str(self.EYE_COUNT), "eyePos")
                  
                     for (x,y,r) in circles:
                        
                         cv2.circle(frame, (x, y), r, (0, 255, 255), 2)
                         cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-                        #self.eyeThresholding(x)
+                        self.eyeThresholding(x)
 
-                cv2.imshow("cle",clahe)
+                      
 
     #* draws info on opencv frame output 
-    def localinfo(self,frame,info):
+    def localinfo(self,frame,info,title):
         cv2.putText(
         frame,
-        "Eye count"+str(info),
+        str(title)+str(info),
         (200, 200),
         cv2.FONT_HERSHEY_DUPLEX,
         0.5,
