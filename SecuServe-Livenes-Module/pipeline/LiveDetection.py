@@ -12,6 +12,7 @@ import cv2
 import numpy as np
 import sys 
 import traceback
+
 from utils import consoleLog
 import dlib
 from utils import const
@@ -20,14 +21,14 @@ from imutils import face_utils
 from datetime import datetime
 from cv2.data import haarcascades
 
-from utils import pose 
+from utils.pose import PoseDetector
 
 class LiveDetection(object):
 
 
     COUNTER = 0
     EYE_AR_THRESH = 0.23
-    EYE_AR_CONSEC_FRAMES = 2.0
+    EYE_AR_CONSEC_FRAMES = 1
     TOTAL = 0
 
     left_counter = 0 
@@ -94,7 +95,7 @@ class LiveDetection(object):
                 rects = detector(gray, 0)
                 
                 
-                #pos = pose.PoseDetector( mode = False, upBody = False, smooth=True, detectionCon = True, trackCon = 0.5)
+                #pos = PoseDetector( mode = False, upBody = True, smooth=True, detectionCon = True, trackCon = 0.5)
                 
                 self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = None)
 
@@ -145,11 +146,12 @@ class LiveDetection(object):
         
             if ear < self.EYE_AR_THRESH:
                 self.COUNTER += 1
+                
             else:
                 if self.COUNTER >= self.EYE_AR_CONSEC_FRAMES:
                     self.TOTAL += 1
                     self.blinked +=1
-                    
+                    consoleLog.PipeLine_Data("blinked about" + " "+ str(self.blinked))
                     consoleLog.Debug("sending message to opencv that eyes blinked")
 
                     self.sendLifeStatus(sender=sender, Alive=False, hasbody=False, timesblinked=self.blinked)
@@ -197,7 +199,6 @@ class LiveDetection(object):
     def detectSkeliton(self,pose,frame):
 
         img, sees = pose.findPose(frame)
-        
-        cv2.imshow("Image", img)
+    
         return sees
 
