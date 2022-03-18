@@ -27,7 +27,8 @@ def main():
     context = zmq.Context(io_threads=4)
 
     #* sender for Socket 
-    sender = context.socket(zmq.PUSH)
+    sender = context.socket(zmq.PUB)
+ 
     sender.bind(const.zmq_sender)
 
     consoleLog.PipeLine_Ok("Started Zmq...")
