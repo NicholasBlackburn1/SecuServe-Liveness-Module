@@ -95,7 +95,7 @@ class LiveDetection(object):
                 rects = detector(gray, 0)
                 
                 
-                #pos = PoseDetector( mode = False, upBody = True, smooth=True, detectionCon = True, trackCon = 0.5)
+                #]pos = PoseDetector( mode = False, upBody = True, smooth=True, detectionCon = True, trackCon = 0.5)
                 
                 self.faceLandmarks(rects=rects,predictor=predictor,face_utils=face_utils,gray=gray,image=image,sender=sender, pose = None)
 
